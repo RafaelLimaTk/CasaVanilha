@@ -3,7 +3,43 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34024.191
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CasaVanilha.Domain", "CasaVanilha.Domain\CasaVanilha.Domain.csproj", "{4DF46839-ECC8-4FB7-A547-0F6D566E35EB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CasaVanilha.Application", "CasaVanilha.Application\CasaVanilha.Application.csproj", "{E3F95A70-8674-4BDB-936C-164AC44D8360}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CasaVanilha.Infra.Data", "CasaVanilha.Infra.Data\CasaVanilha.Infra.Data.csproj", "{C83A79AD-CBF5-498E-AF68-55AA72F5E661}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CasaVanilha.Infra.IoC", "CasaVanilha.Infra.IoC\CasaVanilha.Infra.IoC.csproj", "{24BB3A3E-FC35-4DA6-B740-3C9B1B9A0A56}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CasaVanilha.WebUI", "CasaVanilha.WebUI\CasaVanilha.WebUI.csproj", "{01ECF814-1682-4101-A4A3-D33E75E8D023}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4DF46839-ECC8-4FB7-A547-0F6D566E35EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DF46839-ECC8-4FB7-A547-0F6D566E35EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DF46839-ECC8-4FB7-A547-0F6D566E35EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DF46839-ECC8-4FB7-A547-0F6D566E35EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3F95A70-8674-4BDB-936C-164AC44D8360}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3F95A70-8674-4BDB-936C-164AC44D8360}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3F95A70-8674-4BDB-936C-164AC44D8360}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3F95A70-8674-4BDB-936C-164AC44D8360}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C83A79AD-CBF5-498E-AF68-55AA72F5E661}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C83A79AD-CBF5-498E-AF68-55AA72F5E661}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C83A79AD-CBF5-498E-AF68-55AA72F5E661}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C83A79AD-CBF5-498E-AF68-55AA72F5E661}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24BB3A3E-FC35-4DA6-B740-3C9B1B9A0A56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24BB3A3E-FC35-4DA6-B740-3C9B1B9A0A56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24BB3A3E-FC35-4DA6-B740-3C9B1B9A0A56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24BB3A3E-FC35-4DA6-B740-3C9B1B9A0A56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01ECF814-1682-4101-A4A3-D33E75E8D023}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01ECF814-1682-4101-A4A3-D33E75E8D023}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01ECF814-1682-4101-A4A3-D33E75E8D023}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01ECF814-1682-4101-A4A3-D33E75E8D023}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
