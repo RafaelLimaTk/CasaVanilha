@@ -6,4 +6,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CasaVanilha.Application\CasaVanilha.Application.csproj" />
+    <ProjectReference Include="..\CasaVanilha.Domain\CasaVanilha.Domain.csproj" />
+    <ProjectReference Include="..\CasaVanilha.Infra.Data\CasaVanilha.Infra.Data.csproj" />
+  </ItemGroup>
+
 </Project>
