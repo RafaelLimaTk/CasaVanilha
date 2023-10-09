@@ -1,4 +1,5 @@
-﻿using CasaVanilha.Domain.Interfaces;
+﻿using CasaVanilha.Application.Mappings;
+using CasaVanilha.Domain.Interfaces;
 using CasaVanilha.Infra.Data.Context;
 using CasaVanilha.Infra.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +26,7 @@ public static class DependencyInjection
         Services.AddScoped<ICommandRepository, CommandRepository>();
 
 
-        //Services.AddAutoMapper(typeof(DomainToDTOMappingProfile));
+        Services.AddAutoMapper(typeof(DomainToDTOMappingProfile));
 
         return Services;
     }
