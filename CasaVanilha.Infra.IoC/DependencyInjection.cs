@@ -1,4 +1,6 @@
-﻿using CasaVanilha.Application.Mappings;
+﻿using CasaVanilha.Application.Interfaces;
+using CasaVanilha.Application.Mappings;
+using CasaVanilha.Application.Services;
 using CasaVanilha.Domain.Interfaces;
 using CasaVanilha.Infra.Data.Context;
 using CasaVanilha.Infra.Data.Repositories;
@@ -25,6 +27,11 @@ public static class DependencyInjection
         Services.AddScoped<ISaleRepository, SaleRepository>();
         Services.AddScoped<ICommandRepository, CommandRepository>();
 
+        Services.AddScoped<IProductService, ProductService>();
+        Services.AddScoped<IOrderService, OrderService>();
+        Services.AddScoped<IOrderItemService, OrderItemService>();
+        Services.AddScoped<ISaleService, SaleService>();
+        Services.AddScoped<ICommandService, CommandService>();
 
         Services.AddAutoMapper(typeof(DomainToDTOMappingProfile));
 
