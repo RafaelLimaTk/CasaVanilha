@@ -5,4 +5,5 @@ namespace CasaVanilha.Domain.Interfaces;
 
 public interface IOrderRepository : IRepository<Order>
 {
+    Task<Order> GetOpenOrderAsync();
 }

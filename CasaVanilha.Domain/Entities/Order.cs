@@ -30,6 +30,11 @@ public class Order : EntityBase
 
     public IReadOnlyCollection<OrderItem> OrderItems => _orderItems.AsReadOnly();
 
+    public void RemoveOrderItem(OrderItem orderItem)
+    {
+        _orderItems.Remove(orderItem);
+    }
+
     private void SetOrderDateTime(DateTime orderDateTime)
     {
         if (orderDateTime == default)

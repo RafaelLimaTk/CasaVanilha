@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using X.PagedList;
 using CasaVanilha.Application.DTOs;
 using CasaVanilha.Application.Interfaces;
 using CasaVanilha.WebUI.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using CasaVanilha.WebUI.ViewModels;
 
 namespace CasaVanilha.WebUI.Controllers
 {
@@ -20,12 +22,37 @@ namespace CasaVanilha.WebUI.Controllers
             _mapper = mapper;
         }
 
-        public async Task<IActionResult>Index()
+        public async Task<IActionResult>Index(int? page)
         {
             var Product = await _productService.GetAllAsync();
             var ProductDto = _mapper.Map<IEnumerable<ProductDto>>(Product);
 
-            return View(ProductDto);
+            int pageSize = 15;
+            int pageNumber = (page ?? 1);
+
+            var pagedProductDto = ProductDto.ToPagedList(pageNumber, pageSize);
+
+            return View(pagedProductDto);
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> AjaxIndex(int? page, string searchTerm = null)
+        {
+            var Product = await _productService.GetAllAsync();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                Product = Product.Where(p => p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+            }
+
+            var ProductDto = _mapper.Map<IEnumerable<ProductDto>>(Product);
+
+            int pageSize = 15;
+            int pageNumber = (page ?? 1);
+
+            var pagedProductDto = ProductDto.ToPagedList(pageNumber, pageSize);
+
+            return Json(new { Products = pagedProductDto, SearchTerm = searchTerm });
         }
 
         public IActionResult Privacy()

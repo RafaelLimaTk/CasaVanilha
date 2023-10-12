@@ -1,14 +1,182 @@
-﻿@model IEnumerable<CasaVanilha.Application.DTOs.ProductDto>
+﻿@using X.PagedList;
+@using X.PagedList.Web.Common;
+@addTagHelper *, X.PagedList.Mvc.Core
+
+@model IPagedList<CasaVanilha.Application.DTOs.ProductDto>
+
 @{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-
-    @foreach (var Product in Model)
-    {
-        <p>@Product.Name</p>
+<style>
+    .item-container {
+        width: 33.33%;
+        text-align: center;
     }
+
+    .item-container-span {
+        color: rgba(0, 0, 0, 0.6);
+        font-weight: 600;
+    }
+
+    .div-resumo {
+        margin-top: auto;
+    }
+
+    .btn-imprimir {
+        background-color: #FF4081;
+        color: #fff;
+        border: none;
+        border-radius: 50px;
+        padding: 5px 30px;
+    }
+
+        .btn-imprimir:hover {
+            background-color: #E53770;
+        }
+</style>
+
+<div class="mt-4">
+    <h4 class="fs-4">Bem-vindo!</h4>
 </div>
+
+<div class="row mt-4">
+    <div class="col-6">
+        <div class="d-flex flex-column justify-content-between shadow rounded-3 p-3 h-100">
+            <div>
+                <h4 class="fs-4 mb-3">Resumo por pedido</h4>
+                <div class="d-flex justify-content-between align-items-center pe-1 ps-1 border-bottom">
+                    <div class="item-container text-start ms-1">
+                        <span class="item-container-span fw-semibold">Nome</span>
+                    </div>
+                    <div class="item-container">
+                        <span class="item-container-span fw-semibold">Quantidade</span>
+                    </div>
+                    <div class="item-container text-end">
+                        <span class="item-container-span fw-semibold">Preço</span>
+                    </div>
+                </div>
+                <!--Aqui vai a order pedido-->
+            </div>
+            <div class="d-flex justify-content-end p-2 mt-3">
+                <div class="d-flex flex-column align-items-center">
+                    <div>
+                        <span class="me-3">Total</span>
+                        <span class="fw-bold" style="font-size: 40px;">$15,00</span>
+                    </div>
+                    <div>
+                        <button class="btn-imprimir">Imprimir comanda</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <form>
+            <div class="input-group flex-nowrap">
+                <input type="text" name="searchTerm" class="form-control" placeholder="Pesquise o produto aqui" aria-label="Produto" aria-describedby="addon-wrapping">
+            </div>
+
+            <div class="shadow rounded-3 p-3 mt-3">
+                <div class="d-flex justify-content-between align-items-center pe-1 ps-1 border-bottom">
+                    <div class="item-container text-start ms-1">
+                        <span class="item-container-span fw-semibold">Nome</span>
+                    </div>
+                    <div class="item-container">
+                        <span class="item-container-span fw-semibold">Quantidade</span>
+                    </div>
+                    <div class="item-container text-end">
+                        <span class="item-container-span fw-semibold">Preço</span>
+                    </div>
+                </div>
+                <div id="productList" style="height: 600px;">
+                    @foreach (var Product in Model)
+                    {
+                        <div class="d-flex justify-content-between align-items-center pe-1 ps-1 pb-1 mb-2 mt-1 border-bottom">
+                            <input class="form-check-input m-0" type="checkbox" value="@Product.Id" id="flexCheckDefault" onclick="toggleOrderItem(this)">
+                            <div class="item-container text-start ms-1">
+                                <span>@Product.Name</span>
+                            </div>
+                            <div class="item-container">
+                                <span class="badge rounded-pill bg-primary">@Product.StockQuantity</span>
+                            </div>
+                            <div class="item-container text-end">
+                                <span>@string.Format("{0:C}", @Product.UnitPrice)</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="text-center">
+                    <vc:paged-list-pager paged-list="@Model" link-string="(x => Url.Action(" Index", new { page=x }))" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var debounceTimer;
+            $("input[name='searchTerm']").on('keyup', function () {
+                clearTimeout(debounceTimer);
+                var searchTerm = $(this).val();
+                debounceTimer = setTimeout(function () {        
+                    $.ajax({
+                        url: '@Url.Action("AjaxIndex", "Home")',
+                        type: 'GET',
+                        data: { searchTerm: searchTerm },
+                        success: function (response) {
+                            var productListDiv = $("#productList");
+                            productListDiv.empty();
+
+                            if (response.products.length === 0) {
+                                productListDiv.append('<h3 class="text-center mt-2">Nenhum produto encontrado!</h3>');
+                            }
+
+                            console.log(response.products);
+                            $.each(response.products, function (index, product) {
+                                var formattedPrice = parseFloat(product.unitPrice).toLocaleString('pt-BR', {
+                                    style: 'currency',
+                                    currency: 'BRL'
+                                });
+
+                                var productDiv = '<div class="d-flex justify-content-between align-items-center pe-1 ps-1 pb-1 mb-2 mt-1 border-bottom">' +
+                                    '<input class="form-check-input m-0" type="checkbox" value=" ' + product.id + ' " id="flexCheckDefault" onclick="toggleOrderItem(this)">' +
+                                    '<div class="item-container text-start ms-1">' +
+                                    '<span>' + product.name + '</span>' +
+                                    '</div>' +
+                                    '<div class="item-container">' +
+                                    '<span class="badge rounded-pill bg-primary">' + product.stockQuantity + '</span>' +
+                                    '</div>' +
+                                    '<div class="item-container text-end">' +
+                                    '<span>' + formattedPrice + '</span>' +
+                                    '</div>' +
+                                    '</div>';
+                                productListDiv.append(productDiv);
+                            });
+
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                }, 300);
+            });
+        });
+
+        function toggleOrderItem(checkbox) {
+            var productId = checkbox.value;
+            var isChecked = checkbox.checked;
+            var url = isChecked ? '/Order/AddOrderItem' : '/Order/RemoveOrderItem';
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ productId: productId })
+            });
+        }
+
+    </script>
+}
