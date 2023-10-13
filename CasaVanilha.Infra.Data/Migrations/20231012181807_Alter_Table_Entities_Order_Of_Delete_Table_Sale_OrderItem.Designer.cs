@@ -4,6 +4,7 @@ using CasaVanilha.Infra.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CasaVanilha.Infra.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231012181807_Alter_Table_Entities_Order_Of_Delete_Table_Sale_OrderItem")]
+    partial class Alter_Table_Entities_Order_Of_Delete_Table_Sale_OrderItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,13 +38,12 @@ namespace CasaVanilha.Infra.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("commands", (string)null);
+                    b.ToTable("commands");
                 });
 
             modelBuilder.Entity("CasaVanilha.Domain.Entities.Order", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -49,6 +51,9 @@ namespace CasaVanilha.Infra.Data.Migrations
 
                     b.Property<DateTime>("OrderDateTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -60,37 +65,7 @@ namespace CasaVanilha.Infra.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Orders", (string)null);
-                });
-
-            modelBuilder.Entity("CasaVanilha.Domain.Entities.OrderItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("orderItems", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("CasaVanilha.Domain.Entities.Product", b =>
@@ -122,7 +97,7 @@ namespace CasaVanilha.Infra.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("CasaVanilha.Domain.Entities.Command", b =>
@@ -135,31 +110,14 @@ namespace CasaVanilha.Infra.Data.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("CasaVanilha.Domain.Entities.OrderItem", b =>
-                {
-                    b.HasOne("CasaVanilha.Domain.Entities.Order", "Order")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("OrderId")
-                        .IsRequired();
-
-                    b.HasOne("CasaVanilha.Domain.Entities.Product", "Product")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("ProductId")
-                        .IsRequired();
-
-                    b.Navigation("Order");
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("CasaVanilha.Domain.Entities.Order", b =>
                 {
-                    b.Navigation("OrderItems");
-                });
+                    b.HasOne("CasaVanilha.Domain.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("Id")
+                        .IsRequired();
 
-            modelBuilder.Entity("CasaVanilha.Domain.Entities.Product", b =>
-                {
-                    b.Navigation("OrderItems");
+                    b.Navigation("Product");
                 });
 #pragma warning restore 612, 618
         }

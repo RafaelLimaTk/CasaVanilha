@@ -18,8 +18,8 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
             .HasMaxLength(50);
 
         builder.HasMany(o => o.OrderItems)
-            .WithOne()
-            .HasForeignKey(oi => oi.Id)
+            .WithOne(oi => oi.Order)
+            .HasForeignKey(oi => oi.OrderId)
             .IsRequired();
     }
 }

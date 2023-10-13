@@ -1,5 +1,7 @@
-﻿using CasaVanilha.Application.DTOs;
+﻿using AutoMapper;
+using CasaVanilha.Application.DTOs;
 using CasaVanilha.Application.Interfaces;
+using CasaVanilha.WebUI.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CasaVanilha.WebUI.Controllers
@@ -7,24 +9,81 @@ namespace CasaVanilha.WebUI.Controllers
     public class OrderController : Controller
     {
         private IOrderService _orderService;
+        private IProductService _productService;
+        private IMapper _mapper;
 
-        public OrderController(IOrderService orderService)
+        public OrderController(IOrderService orderService, IMapper mapper, IProductService productService)
         {
             _orderService = orderService;
+            _mapper = mapper;
+            _productService = productService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetOrder(Guid orderId)
+        {
+            var order = await _orderService.GetByIdAsync(orderId);
+
+            if (order == null)
+            {
+                return NotFound();
+
+            }
+
+            return Ok(order);
+        }
+
+        public async Task<IActionResult> GetOpenOrder()
+        {
+            var order = await _orderService.GetOpenOrderAsync();
+            if (order == null)
+                return NotFound();
+            return Ok(order);
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddOrderItem([FromBody] OrderItemDto orderItemDto)
+        public async Task<IActionResult> CloseOrder(Guid orderId)
         {
-            var orderId = await _orderService.AddOrderItemAsync(orderItemDto);
-            return Ok(new { OrderId = orderId });
+            await _orderService.CloseOrderAsync(orderId);
+            return NoContent();
         }
 
         [HttpPost]
-        public async Task<IActionResult> RemoveOrderItem(Guid orderId, Guid productId)  // Supondo que você passará os IDs como parâmetros de rota ou consulta
+        public async Task<IActionResult> AddOrderItem([FromBody] AddOrderItemViewModel addOrderItemDto)
         {
-            await _orderService.RemoveOrderItemAsync(orderId, productId);
-            return Ok();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!HttpContext.Request.Cookies.ContainsKey("OrderId"))
+            {
+                return BadRequest("OrderId não encontrado.");
+            }
+            var OrderId = Guid.Parse(HttpContext.Request.Cookies["OrderId"]);
+
+            var product = await _productService.GetByIdAsync(addOrderItemDto.ProductId);
+            if (product == null)
+            {
+                return NotFound("Produto não encontrado.");
+            }
+
+            var orderItemDto = new OrderItemDto
+            {
+                OrderId = OrderId,
+                Product = new ProductDto
+                {
+                    Id = product.Id,
+                    Name = product.Name,
+                    Description = product.Description,
+                    UnitPrice = product.UnitPrice,
+                    StockQuantity = product.StockQuantity
+                },
+                Quantity = addOrderItemDto.Quantity
+            };
+
+            await _orderService.AddOrderItemAsync(OrderId, orderItemDto);
+            return CreatedAtAction(nameof(GetOpenOrder), OrderId, orderItemDto);
         }
     }
 }

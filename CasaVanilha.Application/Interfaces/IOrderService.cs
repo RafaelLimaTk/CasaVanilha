@@ -6,6 +6,8 @@ namespace CasaVanilha.Application.Interfaces;
 
 public interface IOrderService : IService<OrderDto, Order>
 {
-    Task<Guid> AddOrderItemAsync(OrderItemDto orderItemDto);
-    Task RemoveOrderItemAsync(Guid orderId, Guid productId);
+    Task<Order> GetOpenOrderAsync();
+    Task CloseOrderAsync(Guid orderId);
+    Task AddOrderItemAsync(Guid orderId, OrderItemDto orderItemDto);
+    Task<Guid> CreateOrderAsync();
 }

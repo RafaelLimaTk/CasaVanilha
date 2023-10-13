@@ -5,4 +5,5 @@ namespace CasaVanilha.Domain.Interfaces;
 
 public interface IOrderItemRepository : IRepository<OrderItem>
 {
+    IEnumerable<OrderItem> GetProductsByOrderId(Guid orderId);
 }
