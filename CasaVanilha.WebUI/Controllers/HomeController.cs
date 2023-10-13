@@ -6,6 +6,8 @@ using CasaVanilha.WebUI.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using CasaVanilha.WebUI.ViewModels;
+using CasaVanilha.Application.Services;
+using CasaVanilha.Domain.Entities;
 
 namespace CasaVanilha.WebUI.Controllers
 {
@@ -13,26 +15,53 @@ namespace CasaVanilha.WebUI.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IProductService _productService;
+        private readonly IOrderService _orderService;
+        private readonly IOrderItemService _orderItemService;
         private readonly IMapper _mapper;
 
-        public HomeController(ILogger<HomeController> logger, IProductService productService, IMapper mapper)
+        public HomeController(ILogger<HomeController> logger, IProductService productService, IMapper mapper,
+            IOrderService orderService, IOrderItemService orderItemService)
         {
             _logger = logger;
             _productService = productService;
             _mapper = mapper;
+            _orderService = orderService;
+            _orderItemService = orderItemService;
         }
 
-        public async Task<IActionResult>Index(int? page)
+        public async Task<IActionResult> Index(Guid? orderId, int? productPage, int? orderPage)
         {
-            var Product = await _productService.GetAllAsync();
-            var ProductDto = _mapper.Map<IEnumerable<ProductDto>>(Product);
+            Guid orderIdValue;
+            if (HttpContext.Request.Cookies.ContainsKey("OrderId"))
+            {
+                HttpContext.Response.Cookies.Delete("OrderId");
+            }
+
+            orderIdValue = await _orderService.CreateOrderAsync();
+            HttpContext.Response.Cookies.Append("OrderId", orderIdValue.ToString());
+
+            var products = await _productService.GetAllAsync();
+
+            var allProductDtos = _mapper.Map<IEnumerable<ProductDto>>(products);
 
             int pageSize = 15;
-            int pageNumber = (page ?? 1);
+            int productPageNumber = (productPage ?? 1);
+            int orderPageNumber = (orderPage ?? 1);
 
-            var pagedProductDto = ProductDto.ToPagedList(pageNumber, pageSize);
+            var productAndOrderListViewModel = new ProductAndOrderListViewModel
+            {
+                PagedProductDto = allProductDtos.ToPagedList(productPageNumber, pageSize),
+            };
 
-            return View(pagedProductDto);
+            return View(productAndOrderListViewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetOrderItems(Guid orderId)
+        {
+            var orderItems = _orderItemService.GetProductsByOrderId(orderId);
+            var productOrderItemDtos = _mapper.Map<IEnumerable<OrderItemDto>>(orderItems);
+            return Json(productOrderItemDtos);
         }
 
         [HttpGet]

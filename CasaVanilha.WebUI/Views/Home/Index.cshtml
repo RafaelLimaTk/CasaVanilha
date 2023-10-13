@@ -2,7 +2,7 @@
 @using X.PagedList.Web.Common;
 @addTagHelper *, X.PagedList.Mvc.Core
 
-@model IPagedList<CasaVanilha.Application.DTOs.ProductDto>
+@model CasaVanilha.WebUI.ViewModels.ProductAndOrderListViewModel
 
 @{
     ViewData["Title"] = "Home Page";
@@ -28,7 +28,7 @@
         color: #fff;
         border: none;
         border-radius: 50px;
-        padding: 5px 30px;
+        padding: 5px 65px;
     }
 
         .btn-imprimir:hover {
@@ -56,13 +56,15 @@
                         <span class="item-container-span fw-semibold">Preço</span>
                     </div>
                 </div>
-                <!--Aqui vai a order pedido-->
+                <div id="ProductOrderItem">
+                    
+                </div>
             </div>
             <div class="d-flex justify-content-end p-2 mt-3">
                 <div class="d-flex flex-column align-items-center">
                     <div>
-                        <span class="me-3">Total</span>
-                        <span class="fw-bold" style="font-size: 40px;">$15,00</span>
+                        <span class="me-1">Somatório total</span>
+                        <span id="OrderItemtotals" class="fw-bold" style="font-size: 40px;">$00,00</span>
                     </div>
                     <div>
                         <button class="btn-imprimir">Imprimir comanda</button>
@@ -90,7 +92,7 @@
                     </div>
                 </div>
                 <div id="productList" style="height: 600px;">
-                    @foreach (var Product in Model)
+                    @foreach (var Product in Model.PagedProductDto)
                     {
                         <div class="d-flex justify-content-between align-items-center pe-1 ps-1 pb-1 mb-2 mt-1 border-bottom">
                             <input class="form-check-input m-0" type="checkbox" value="@Product.Id" id="flexCheckDefault" onclick="toggleOrderItem(this)">
@@ -121,7 +123,7 @@
             $("input[name='searchTerm']").on('keyup', function () {
                 clearTimeout(debounceTimer);
                 var searchTerm = $(this).val();
-                debounceTimer = setTimeout(function () {        
+                debounceTimer = setTimeout(function () {
                     $.ajax({
                         url: '@Url.Action("AjaxIndex", "Home")',
                         type: 'GET',
@@ -134,7 +136,6 @@
                                 productListDiv.append('<h3 class="text-center mt-2">Nenhum produto encontrado!</h3>');
                             }
 
-                            console.log(response.products);
                             $.each(response.products, function (index, product) {
                                 var formattedPrice = parseFloat(product.unitPrice).toLocaleString('pt-BR', {
                                     style: 'currency',
@@ -166,17 +167,126 @@
         });
 
         function toggleOrderItem(checkbox) {
-            var productId = checkbox.value;
+            var productId = checkbox.value.trim();
             var isChecked = checkbox.checked;
-            var url = isChecked ? '/Order/AddOrderItem' : '/Order/RemoveOrderItem';
+            var quantity = 1;
+            var currentOrderId = $('#currentOrderId').val();
 
+            if (isChecked) {
+                createNewOrder(currentOrderId, productId, quantity);
+            } else {
+                // Handle unchecking of the checkbox if needed
+                // (e.g., by deleting the order, updating the quantity, etc.)
+            }
+        }
+
+        function createNewOrder(orderId, productId, quantity) {
+            var url = '/Order/AddOrderItem';
             $.ajax({
                 url: url,
                 method: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({ productId: productId })
+                data: JSON.stringify({ orderId: orderId, productId: productId, quantity: quantity }),
+                success: function (response) {
+                    var orderId = response.orderId;
+                    $('#currentOrderId').val(orderId);
+                    loadOrderItems(orderId);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error('Error adding order item:', textStatus, errorThrown);
+                }
             });
         }
 
+        function addOrderItem(orderId, productId, quantity) {
+            var url = '/Order/AddExistOrderItem';
+            $.ajax({
+                url: url,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ orderId: orderId, productId: productId, quantity: quantity }),
+                success: function (response) {
+                    loadOrderItems(orderId);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error('Error adding order item:', textStatus, errorThrown);
+                }
+            });
+        }
+
+        function loadOrderItems(orderId) {
+            $.ajax({
+                url: '/Home/GetOrderItems',
+                method: 'GET',
+                data: { orderId: orderId },
+                success: function (response) {
+                    var parentElement = $("#ProductOrderItem");
+                    parentElement.empty();
+
+                    totalPriceItems = 0;
+
+                    response.forEach(function (order) {
+                        var html = createItemHtml(order);
+                        parentElement.append(html);
+                    });
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error('Erro ao carregar itens do pedido:', textStatus, errorThrown);
+                }
+            });
+        }
+
+        var totalPriceItems = 0;
+
+        function createItemHtml(order) {
+            var itemTotalPrice = order.product.unitPrice * order.quantity;
+            totalPriceItems += itemTotalPrice;
+            updateTotalPriceDisplay();
+            return `
+                <div class="d-flex justify-content-between align-items-center pe-1 ps-1 pb-1 mb-2 mt-1 border-bottom">
+                    <div class="item-container text-start ms-1">
+                        <span>${order.product.name}</span>
+                    </div>
+                    <div class="item-container">
+                        <button onclick="decreaseQuantity('orderItemIdGoesHere')" class="btn btn-sm btn-secondary">-</button>
+                        <span class="badge rounded-pill bg-primary" id="orderItemQuantity_orderItemIdGoesHere">${order.quantity}</span>
+                        <button onclick="increaseQuantity('orderItemIdGoesHere')" class="btn btn-sm btn-secondary">+</button>
+                    </div>
+                    <div class="item-container text-end">
+                        <span>${itemTotalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateTotalPriceDisplay() {
+            const formattedTotalPrice = totalPriceItems.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            document.querySelector("#OrderItemtotals").innerText = formattedTotalPrice;
+        }
+
+        function decreaseQuantity(orderItemId) {
+            let span = document.getElementById('orderItemQuantity_' + orderItemId);
+            let quantity = parseInt(span.textContent, 10);
+
+            if (quantity > 1) {
+                quantity--;
+                span.textContent = quantity.toString();
+                updateOrderItemQuantity(orderItemId, quantity);
+            }
+        }
+
+        function increaseQuantity(orderItemId) {
+            let span = document.getElementById('orderItemQuantity_' + orderItemId);
+            let quantity = parseInt(span.textContent, 10);
+
+            quantity++;
+            span.textContent = quantity.toString();
+            updateOrderItemQuantity(orderItemId, quantity);
+        }
+
+        function updateOrderItemQuantity(orderItemId, quantity) {
+            // Aqui você deverá fazer uma chamada AJAX para atualizar a quantidade do item no back-end.
+            // Pode usar o exemplo do seu método toggleOrderItem como base.
+        }
     </script>
 }

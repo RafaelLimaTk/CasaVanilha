@@ -12,11 +12,10 @@ public class ApplicationDbContext : DbContext
 
     DbSet<Product> Products { get; set; }
     DbSet<Order> Orders { get; set; }
-    DbSet<OrderItem> OrdersItem { get; set; }
-    DbSet<Sale> Sales { get; set; }
     DbSet<Command> commands { get; set; }
+    DbSet<OrderItem> orderItems { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         foreach (var property in modelBuilder.Model.GetEntityTypes()
             .SelectMany(e => e.GetProperties()

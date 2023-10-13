@@ -9,6 +9,7 @@ public class Product : EntityBase
     private string _description;
     private decimal _unitPrice;
     private int _stockQuantity;
+    private readonly List<OrderItem> _orderItems = new List<OrderItem>();
 
     private Product() { }
 
@@ -66,5 +67,22 @@ public class Product : EntityBase
         if (stockQuantity < 0)
             throw new ArgumentOutOfRangeException(nameof(stockQuantity), "Stock quantity cannot be negative");
         _stockQuantity = stockQuantity;
+    }
+
+    public IReadOnlyCollection<OrderItem> OrderItems => _orderItems.AsReadOnly();
+    public void AddOrderItem(OrderItem orderItem)
+    {
+        if (orderItem == null)
+            throw new ArgumentNullException(nameof(orderItem));
+
+        _orderItems.Add(orderItem);
+    }
+
+    public void RemoveOrderItem(OrderItem orderItem)
+    {
+        if (orderItem == null)
+            throw new ArgumentNullException(nameof(orderItem));
+
+        _orderItems.Remove(orderItem);
     }
 }

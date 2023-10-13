@@ -6,4 +6,5 @@ namespace CasaVanilha.Application.Interfaces;
 
 public interface IOrderItemService : IService<OrderItemDto, OrderItem>
 {
+    IEnumerable<OrderItem> GetProductsByOrderId(Guid orderId);
 }

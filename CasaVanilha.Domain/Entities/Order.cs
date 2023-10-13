@@ -6,9 +6,9 @@ public class Order : EntityBase
 {
     private DateTime _orderDateTime;
     private string _status;
-    private readonly List<OrderItem> _orderItems = new List<OrderItem>();
+    private List<OrderItem> _orderItems = new List<OrderItem>();
 
-    private Order() { }
+    public Order() { }
 
     public Order(DateTime orderDateTime, string status)
     {
@@ -28,12 +28,21 @@ public class Order : EntityBase
         private set => SetStatus(value);
     }
 
-    public IReadOnlyCollection<OrderItem> OrderItems => _orderItems.AsReadOnly();
-
-    public void RemoveOrderItem(OrderItem orderItem)
+    public void Close()
     {
-        _orderItems.Remove(orderItem);
+        Status = "Fechada";
     }
+
+    public void Open()
+    {
+        Status = "Nova";
+    }
+    public void AddOrderItem(OrderItem orderItem)
+    {
+        _orderItems.Add(orderItem);
+    }
+
+    public IReadOnlyCollection<OrderItem> OrderItems => _orderItems.AsReadOnly();
 
     private void SetOrderDateTime(DateTime orderDateTime)
     {
@@ -49,10 +58,22 @@ public class Order : EntityBase
         _status = status;
     }
 
-    public void AddOrderItem(OrderItem orderItem)
+    public void AddProduct(Product product, int quantity)
     {
-        if (orderItem == null)
-            throw new ArgumentNullException(nameof(orderItem));
-        _orderItems.Add(orderItem);
+        if (product == null)
+            throw new ArgumentNullException(nameof(product));
+        if (quantity <= 0)
+            throw new ArgumentOutOfRangeException(nameof(quantity), "A quantidade deve ser maior que zero.");
+
+        var existingOrderItem = _orderItems.SingleOrDefault(oi => oi.Product == product);
+        if (existingOrderItem == null)
+        {
+            var newOrderItem = new OrderItem(product.Id, quantity);
+            _orderItems.Add(newOrderItem);
+        }
+        else
+        {
+            existingOrderItem.AddQuantity(quantity);
+        }
     }
 }

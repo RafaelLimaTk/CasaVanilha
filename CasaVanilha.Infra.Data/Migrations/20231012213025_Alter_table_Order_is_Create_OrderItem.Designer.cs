@@ -4,6 +4,7 @@ using CasaVanilha.Infra.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CasaVanilha.Infra.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231012213025_Alter_table_Order_is_Create_OrderItem")]
+    partial class Alter_table_Order_is_Create_OrderItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,7 +38,7 @@ namespace CasaVanilha.Infra.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("commands", (string)null);
+                    b.ToTable("commands");
                 });
 
             modelBuilder.Entity("CasaVanilha.Domain.Entities.Order", b =>
@@ -60,7 +63,7 @@ namespace CasaVanilha.Infra.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("CasaVanilha.Domain.Entities.OrderItem", b =>
@@ -90,7 +93,7 @@ namespace CasaVanilha.Infra.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("orderItems", (string)null);
+                    b.ToTable("orderItems");
                 });
 
             modelBuilder.Entity("CasaVanilha.Domain.Entities.Product", b =>
@@ -122,7 +125,7 @@ namespace CasaVanilha.Infra.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("CasaVanilha.Domain.Entities.Command", b =>
