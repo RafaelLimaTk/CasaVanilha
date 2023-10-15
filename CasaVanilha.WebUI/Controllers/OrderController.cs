@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CasaVanilha.Application.DTOs;
 using CasaVanilha.Application.Interfaces;
+using CasaVanilha.Domain.Entities;
 using CasaVanilha.WebUI.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -90,8 +91,10 @@ namespace CasaVanilha.WebUI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RemoveOrderItem([FromBody] Guid productId)
+        public async Task<IActionResult> RemoveOrderItem(RemoveOrderItemViewModel removeOrderItemDto)
         {
+            var productId = "0dd20c22-789a-43a5-b4e9-0ec3fc40250c";
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -104,9 +107,9 @@ namespace CasaVanilha.WebUI.Controllers
 
             var orderId = Guid.Parse(HttpContext.Request.Cookies["OrderId"]);
 
-            await _orderItemService.DeleteProductFromOrder(orderId, productId);
+            await _orderItemService.DeleteProductFromOrder(orderId, removeOrderItemDto.ProductId);
 
-            return Ok("Item do pedido removido com sucesso.");
+            return CreatedAtAction(nameof(GetOpenOrder), orderId);
         }
     }
 }

@@ -167,6 +167,7 @@
         });
 
         function toggleOrderItem(checkbox) {
+            debugger
             var productId = checkbox.value.trim();
             var isChecked = checkbox.checked;
             var quantity = 1;
@@ -203,14 +204,10 @@
                 url: url,
                 method: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({ productId: productId }),
+                data: JSON.stringify({ orderId: orderId, productId: productId }),
                 success: function (response) {
-                    if (response.success) {
-                        // Você pode querer atualizar a lista de OrderItems após a remoção
-                        loadOrderItems(orderId);
-                    } else {
-                        console.error(response.message);
-                    }
+                    console.log(response);
+                    loadOrderItems(response);
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.error('Erro ao remover o item do pedido:', textStatus, errorThrown);

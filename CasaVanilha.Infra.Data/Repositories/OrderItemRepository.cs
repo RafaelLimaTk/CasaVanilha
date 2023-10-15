@@ -30,7 +30,7 @@ public class OrderItemRepository : Repository<OrderItem>, IOrderItemRepository
         if (orderItem != null)
         {
             Entities.Remove(orderItem);
-            await _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }
