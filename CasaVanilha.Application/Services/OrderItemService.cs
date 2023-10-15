@@ -20,4 +20,9 @@ public class OrderItemService : Service<OrderItemDto, OrderItem>, IOrderItemServ
     {
         return _orderItemRepository.GetProductsByOrderId(orderId);
     }
+
+    public async Task DeleteProductFromOrder(Guid orderId, Guid productId)
+    {
+        await _orderItemRepository.DeleteByOrderIdAndProductId(orderId, productId);
+    }
 }

@@ -7,4 +7,5 @@ namespace CasaVanilha.Application.Interfaces;
 public interface IOrderItemService : IService<OrderItemDto, OrderItem>
 {
     IEnumerable<OrderItem> GetProductsByOrderId(Guid orderId);
+    Task DeleteProductFromOrder(Guid orderId, Guid productId);
 }

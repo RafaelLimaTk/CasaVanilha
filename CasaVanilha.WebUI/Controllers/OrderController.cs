@@ -9,14 +9,17 @@ namespace CasaVanilha.WebUI.Controllers
     public class OrderController : Controller
     {
         private IOrderService _orderService;
+        private IOrderItemService _orderItemService;
         private IProductService _productService;
         private IMapper _mapper;
 
-        public OrderController(IOrderService orderService, IMapper mapper, IProductService productService)
+        public OrderController(IOrderService orderService, IMapper mapper, 
+            IProductService productService, IOrderItemService orderItemService)
         {
             _orderService = orderService;
             _mapper = mapper;
             _productService = productService;
+            _orderItemService = orderItemService;
         }
 
         [HttpGet]
@@ -84,6 +87,26 @@ namespace CasaVanilha.WebUI.Controllers
 
             await _orderService.AddOrderItemAsync(OrderId, orderItemDto);
             return CreatedAtAction(nameof(GetOpenOrder), OrderId, orderItemDto);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveOrderItem([FromBody] Guid productId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!HttpContext.Request.Cookies.ContainsKey("OrderId"))
+            {
+                return BadRequest("OrderId não encontrado.");
+            }
+
+            var orderId = Guid.Parse(HttpContext.Request.Cookies["OrderId"]);
+
+            await _orderItemService.DeleteProductFromOrder(orderId, productId);
+
+            return Ok("Item do pedido removido com sucesso.");
         }
     }
 }

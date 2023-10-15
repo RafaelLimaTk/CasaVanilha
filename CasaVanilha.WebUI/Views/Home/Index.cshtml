@@ -175,8 +175,7 @@
             if (isChecked) {
                 createNewOrder(currentOrderId, productId, quantity);
             } else {
-                // Handle unchecking of the checkbox if needed
-                // (e.g., by deleting the order, updating the quantity, etc.)
+                removeOrderItem(currentOrderId, productId);
             }
         }
 
@@ -198,18 +197,23 @@
             });
         }
 
-        function addOrderItem(orderId, productId, quantity) {
-            var url = '/Order/AddExistOrderItem';
+        function removeOrderItem(orderId, productId) {
+            var url = '/Order/RemoveOrderItem';
             $.ajax({
                 url: url,
                 method: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({ orderId: orderId, productId: productId, quantity: quantity }),
+                data: JSON.stringify({ productId: productId }),
                 success: function (response) {
-                    loadOrderItems(orderId);
+                    if (response.success) {
+                        // Você pode querer atualizar a lista de OrderItems após a remoção
+                        loadOrderItems(orderId);
+                    } else {
+                        console.error(response.message);
+                    }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
-                    console.error('Error adding order item:', textStatus, errorThrown);
+                    console.error('Erro ao remover o item do pedido:', textStatus, errorThrown);
                 }
             });
         }
