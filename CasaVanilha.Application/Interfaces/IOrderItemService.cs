@@ -8,4 +8,5 @@ public interface IOrderItemService : IService<OrderItemDto, OrderItem>
 {
     IEnumerable<OrderItem> GetProductsByOrderId(Guid orderId);
     Task DeleteProductFromOrder(Guid orderId, Guid productId);
+    Task<bool> UpdateOrderItemQuantityAsync(Guid orderId, Guid productId, int quantity);
 }

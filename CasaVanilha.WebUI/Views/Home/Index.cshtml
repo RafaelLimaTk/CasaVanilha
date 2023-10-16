@@ -167,7 +167,6 @@
         });
 
         function toggleOrderItem(checkbox) {
-            debugger
             var productId = checkbox.value.trim();
             var isChecked = checkbox.checked;
             var quantity = 1;
@@ -206,7 +205,6 @@
                 contentType: 'application/json',
                 data: JSON.stringify({ orderId: orderId, productId: productId }),
                 success: function (response) {
-                    console.log(response);
                     loadOrderItems(response);
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
@@ -230,6 +228,7 @@
                         var html = createItemHtml(order);
                         parentElement.append(html);
                     });
+                    updateTotalPriceDisplay();
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.error('Erro ao carregar itens do pedido:', textStatus, errorThrown);
@@ -242,15 +241,16 @@
         function createItemHtml(order) {
             var itemTotalPrice = order.product.unitPrice * order.quantity;
             totalPriceItems += itemTotalPrice;
-            updateTotalPriceDisplay();
+            // concertar o botão increment e decrement do sistema
             return `
                 <div class="d-flex justify-content-between align-items-center pe-1 ps-1 pb-1 mb-2 mt-1 border-bottom">
                     <div class="item-container text-start ms-1">
                         <span>${order.product.name}</span>
                     </div>
                     <div class="item-container">
+                        <input id="productId" type="hidden" value="${order.product.id}"/>
                         <button onclick="decreaseQuantity('orderItemIdGoesHere')" class="btn btn-sm btn-secondary">-</button>
-                        <span class="badge rounded-pill bg-primary" id="orderItemQuantity_orderItemIdGoesHere">${order.quantity}</span>
+                        <span class="badge rounded-pill bg-primary" id="orderItemQuantity_${order.product.id}">${order.quantity}</span>
                         <button onclick="increaseQuantity('orderItemIdGoesHere')" class="btn btn-sm btn-secondary">+</button>
                     </div>
                     <div class="item-container text-end">
@@ -266,28 +266,44 @@
         }
 
         function decreaseQuantity(orderItemId) {
-            let span = document.getElementById('orderItemQuantity_' + orderItemId);
+            let productIdInput = document.getElementById('productId');
+            let productId = productIdInput.value;
+            let span = document.getElementById('orderItemQuantity_' + productId);
             let quantity = parseInt(span.textContent, 10);
 
             if (quantity > 1) {
                 quantity--;
                 span.textContent = quantity.toString();
-                updateOrderItemQuantity(orderItemId, quantity);
+                updateOrderItemQuantity(productId, quantity);
             }
         }
 
         function increaseQuantity(orderItemId) {
-            let span = document.getElementById('orderItemQuantity_' + orderItemId);
+            let productIdInput = document.getElementById('productId');
+            let productId = productIdInput.value;
+            let span = document.getElementById('orderItemQuantity_' + productId);
             let quantity = parseInt(span.textContent, 10);
 
             quantity++;
             span.textContent = quantity.toString();
-            updateOrderItemQuantity(orderItemId, quantity);
+            updateOrderItemQuantity(productId, quantity);
         }
 
-        function updateOrderItemQuantity(orderItemId, quantity) {
-            // Aqui você deverá fazer uma chamada AJAX para atualizar a quantidade do item no back-end.
-            // Pode usar o exemplo do seu método toggleOrderItem como base.
+        function updateOrderItemQuantity(productId, quantity) {
+            var url = '/Order/UpdateOrderItemQuantity';
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ ProductId: productId, Quantity: quantity }),
+                success: function (response) {
+                    loadOrderItems(response);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error('Erro ao atualizar a quantidade do item do pedido:', textStatus, errorThrown);
+                }
+            });
         }
     </script>
 }

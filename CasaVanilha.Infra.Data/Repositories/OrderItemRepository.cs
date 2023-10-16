@@ -33,4 +33,10 @@ public class OrderItemRepository : Repository<OrderItem>, IOrderItemRepository
             await _context.SaveChangesAsync();
         }
     }
+
+    public async Task<OrderItem> GetOrderItemAsync(Guid orderId, Guid productId)
+    {
+        return await Entities
+            .FirstOrDefaultAsync(oi => oi.OrderId == orderId && oi.ProductId == productId);
+    }
 }

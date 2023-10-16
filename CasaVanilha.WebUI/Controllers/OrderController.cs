@@ -53,7 +53,7 @@ namespace CasaVanilha.WebUI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddOrderItem([FromBody] AddOrderItemViewModel addOrderItemDto)
+        public async Task<IActionResult> AddOrderItem([FromBody] OrderItemViewModel OrderItemDto)
         {
             if (!ModelState.IsValid)
             {
@@ -66,7 +66,7 @@ namespace CasaVanilha.WebUI.Controllers
             }
             var OrderId = Guid.Parse(HttpContext.Request.Cookies["OrderId"]);
 
-            var product = await _productService.GetByIdAsync(addOrderItemDto.ProductId);
+            var product = await _productService.GetByIdAsync(OrderItemDto.ProductId);
             if (product == null)
             {
                 return NotFound("Produto não encontrado.");
@@ -83,7 +83,7 @@ namespace CasaVanilha.WebUI.Controllers
                     UnitPrice = product.UnitPrice,
                     StockQuantity = product.StockQuantity
                 },
-                Quantity = addOrderItemDto.Quantity
+                Quantity = OrderItemDto.Quantity
             };
 
             await _orderService.AddOrderItemAsync(OrderId, orderItemDto);
@@ -91,10 +91,8 @@ namespace CasaVanilha.WebUI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RemoveOrderItem(RemoveOrderItemViewModel removeOrderItemDto)
+        public async Task<IActionResult> RemoveOrderItem([FromBody] RemoveOrderItemViewModel removeOrderItemDto)
         {
-            var productId = "0dd20c22-789a-43a5-b4e9-0ec3fc40250c";
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -104,10 +102,32 @@ namespace CasaVanilha.WebUI.Controllers
             {
                 return BadRequest("OrderId não encontrado.");
             }
-
             var orderId = Guid.Parse(HttpContext.Request.Cookies["OrderId"]);
 
             await _orderItemService.DeleteProductFromOrder(orderId, removeOrderItemDto.ProductId);
+
+            return CreatedAtAction(nameof(GetOpenOrder), orderId);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateOrderItemQuantity([FromBody] OrderItemViewModel OrderItemDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!HttpContext.Request.Cookies.ContainsKey("OrderId"))
+            {
+                return BadRequest("OrderId não encontrado.");
+            }
+            var orderId = Guid.Parse(HttpContext.Request.Cookies["OrderId"]);
+
+            var result = await _orderItemService.UpdateOrderItemQuantityAsync(orderId, OrderItemDto.ProductId, OrderItemDto.Quantity);
+            if (!result)
+            {
+                return BadRequest("Erro ao atualizar a quantidade do item do pedido.");
+            }
 
             return CreatedAtAction(nameof(GetOpenOrder), orderId);
         }
