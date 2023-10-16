@@ -6,4 +6,6 @@ namespace CasaVanilha.Domain.Interfaces;
 public interface IOrderItemRepository : IRepository<OrderItem>
 {
     IEnumerable<OrderItem> GetProductsByOrderId(Guid orderId);
+    Task DeleteByOrderIdAndProductId(Guid orderId, Guid productId);
+    Task<OrderItem> GetOrderItemAsync(Guid orderId, Guid productId);
 }

@@ -20,4 +20,23 @@ public class OrderItemService : Service<OrderItemDto, OrderItem>, IOrderItemServ
     {
         return _orderItemRepository.GetProductsByOrderId(orderId);
     }
+
+    public async Task DeleteProductFromOrder(Guid orderId, Guid productId)
+    {
+        await _orderItemRepository.DeleteByOrderIdAndProductId(orderId, productId);
+    }
+
+    public async Task<bool> UpdateOrderItemQuantityAsync(Guid orderId, Guid productId, int quantity)
+    {
+        var orderItem = await _orderItemRepository.GetOrderItemAsync(orderId, productId);
+        if (orderItem == null)
+        {
+            return false;
+        }
+
+        orderItem.UpdateQuantity(quantity);
+        await _orderItemRepository.UpdateAsync(orderItem);
+
+        return true;
+    }
 }

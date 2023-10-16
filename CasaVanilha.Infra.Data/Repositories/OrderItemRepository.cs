@@ -8,8 +8,10 @@ namespace CasaVanilha.Infra.Data.Repositories;
 
 public class OrderItemRepository : Repository<OrderItem>, IOrderItemRepository
 {
+    private readonly ApplicationDbContext _context;
     public OrderItemRepository(ApplicationDbContext context) : base(context)
     {
+        _context = context;
     }
 
     public IEnumerable<OrderItem> GetProductsByOrderId(Guid orderId)
@@ -18,5 +20,23 @@ public class OrderItemRepository : Repository<OrderItem>, IOrderItemRepository
         .Include(oi => oi.Product)
         .Where(oi => oi.OrderId == orderId)
         .ToList();
+    }
+
+    public async Task DeleteByOrderIdAndProductId(Guid orderId, Guid productId)
+    {
+        var orderItem = Entities
+            .FirstOrDefault(oi => oi.OrderId == orderId && oi.ProductId == productId);
+
+        if (orderItem != null)
+        {
+            Entities.Remove(orderItem);
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task<OrderItem> GetOrderItemAsync(Guid orderId, Guid productId)
+    {
+        return await Entities
+            .FirstOrDefaultAsync(oi => oi.OrderId == orderId && oi.ProductId == productId);
     }
 }
