@@ -85,4 +85,12 @@ public class Product : EntityBase
 
         _orderItems.Remove(orderItem);
     }
+
+    public void DeductStock(int quantity)
+    {
+        if (_stockQuantity - quantity < 0)
+            throw new InvalidOperationException("Insufficient stock.");
+
+        _stockQuantity -= quantity;
+    }
 }

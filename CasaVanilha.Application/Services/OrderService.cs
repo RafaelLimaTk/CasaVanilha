@@ -11,14 +11,19 @@ namespace CasaVanilha.Application.Services;
 public class OrderService : Service<OrderDto, Order>, IOrderService
 {
     private readonly IOrderRepository _orderRepository;
+    private readonly IOrderItemService _orderItemService;
     private readonly IProductService _productService;
+    private readonly IPrinterService _printerService;
     private readonly IMapper _mapper;
 
-    public OrderService(IOrderRepository orderRepository, IProductService productService, IMapper mapper)
+    public OrderService(IOrderRepository orderRepository, IProductService productService,
+        IMapper mapper, IOrderItemService orderItemService, IPrinterService printerService)
         : base(mapper, orderRepository)
     {
         _orderRepository = orderRepository;
         _productService = productService;
+        _orderItemService = orderItemService;
+        _printerService = printerService;
         _mapper = mapper;
     }
 
@@ -30,6 +35,12 @@ public class OrderService : Service<OrderDto, Order>, IOrderService
     public async Task CloseOrderAsync(Guid orderId)
     {
         await _orderRepository.CloseOrderAsync(orderId);
+
+        var orderItems = _orderItemService.GetProductsByOrderId(orderId);
+
+        await _productService.UpdateStockAsync(orderItems.ToList());
+
+        //_printerService.PrintOrderItems(orderItems.ToList());
     }
 
     public async Task AddOrderItemAsync(Guid orderId, OrderItemDto orderItemDto)

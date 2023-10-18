@@ -46,10 +46,17 @@ namespace CasaVanilha.WebUI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CloseOrder(Guid orderId)
+        public async Task<IActionResult> CloseOrder()
         {
-            await _orderService.CloseOrderAsync(orderId);
-            return NoContent();
+            if (!HttpContext.Request.Cookies.ContainsKey("OrderId"))
+            {
+                return BadRequest("OrderId não encontrado.");
+            }
+            var OrderId = Guid.Parse(HttpContext.Request.Cookies["OrderId"]);
+
+            await _orderService.CloseOrderAsync(OrderId);
+
+            return CreatedAtAction(nameof(GetOpenOrder), OrderId);
         }
 
         [HttpPost]
