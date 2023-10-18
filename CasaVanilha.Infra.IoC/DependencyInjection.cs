@@ -37,6 +37,7 @@ public static class DependencyInjection
         Services.AddScoped<IOrderService, OrderService>();
         Services.AddScoped<IOrderItemService, OrderItemService>();
         Services.AddScoped<ICommandService, CommandService>();
+        Services.AddScoped<IPrinterService, PrinterService>();
 
         Services.AddAutoMapper(typeof(DomainToDTOMappingProfile));
         var config = new MapperConfiguration(cfg => {

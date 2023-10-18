@@ -26,8 +26,6 @@ public class OrderRepository : Repository<Order>, IOrderRepository
 
     public async Task AddOrderItemAsync(Guid orderId, OrderItem orderItem)
     {
-        var order = await GetOrderWithItemsByIdAsync(orderId);
-
         var orderItemSave = new OrderItem(orderItem.Id, orderId, orderItem.ProductId, orderItem.Quantity);
 
         await _orderItemRepository.CreateAsync(orderItemSave);

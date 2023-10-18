@@ -6,4 +6,5 @@ namespace CasaVanilha.Application.Interfaces;
 
 public interface IProductService : IService<ProductDto, Product>
 {
+    Task UpdateStockAsync(List<OrderItem> orderItems);
 }

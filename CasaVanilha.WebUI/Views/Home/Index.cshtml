@@ -19,6 +19,21 @@
         font-weight: 600;
     }
 
+    .quantity-container .btn,
+    .quantity-container span {
+        border: none;
+        padding: 10px;
+    }
+
+    .quantity-container .btn {
+        background-color: #e0e0e0;
+        cursor: pointer; 
+    }
+
+    .quantity-container span {
+        padding: 10px 20px; 
+    }
+
     .div-resumo {
         margin-top: auto;
     }
@@ -47,13 +62,13 @@
                 <h4 class="fs-4 mb-3">Resumo por pedido</h4>
                 <div class="d-flex justify-content-between align-items-center pe-1 ps-1 border-bottom">
                     <div class="item-container text-start ms-1">
-                        <span class="item-container-span fw-semibold">Nome</span>
+                        <span class="item-container-span fw-semibold">Item</span>
                     </div>
                     <div class="item-container">
                         <span class="item-container-span fw-semibold">Quantidade</span>
                     </div>
                     <div class="item-container text-end">
-                        <span class="item-container-span fw-semibold">Preço</span>
+                        <span class="item-container-span fw-semibold">Subtotal</span>
                     </div>
                 </div>
                 <div id="ProductOrderItem">
@@ -67,7 +82,7 @@
                         <span id="OrderItemtotals" class="fw-bold" style="font-size: 40px;">$00,00</span>
                     </div>
                     <div>
-                        <button class="btn-imprimir">Imprimir comanda</button>
+                        <button onclick="CloseOrder()" class="btn-imprimir">Imprimir comanda</button>
                     </div>
                 </div>
             </div>
@@ -247,10 +262,12 @@
                         <span>${order.product.name}</span>
                     </div>
                     <div class="item-container">
-                        <input id="productId_${order.product.id}" type="hidden" value="${order.product.id}"/>
-                        <button onclick="decreaseQuantity('${order.product.id}')" class="btn btn-sm btn-secondary">-</button>
-                        <span class="badge rounded-pill bg-primary" id="orderItemQuantity_${order.product.id}">${order.quantity}</span>
-                        <button onclick="increaseQuantity('${order.product.id}')" class="btn btn-sm btn-secondary">+</button>
+                        <div class="d-flex justify-content-center align-items-center quantity-container">
+                            <input id="productId_${order.product.id}" type="hidden" value="${order.product.id}"/>
+                            <button onclick="decreaseQuantity('${order.product.id}')" class="btn">-</button>
+                            <span id="orderItemQuantity_${order.product.id}">${order.quantity}</span>
+                            <button onclick="increaseQuantity('${order.product.id}')" class="btn">+</button>
+                        </div>
                     </div>
                     <div class="item-container text-end">
                         <span>${itemTotalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
@@ -265,7 +282,6 @@
         }
 
         function decreaseQuantity(orderItemId) {
-            debugger
             let productId = $('#productId_' + orderItemId).val();
             let span = $('#orderItemQuantity_' + productId);
             let quantity = parseInt(span.text(), 10);
@@ -300,6 +316,21 @@
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.error('Erro ao atualizar a quantidade do item do pedido:', textStatus, errorThrown);
+                }
+            });
+        }
+
+        function CloseOrder() {
+            var url = '/Order/CloseOrder';
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                success: function (response) {
+                    location.reload();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error('Erro ao fechar o pedido:', textStatus, errorThrown);
                 }
             });
         }
