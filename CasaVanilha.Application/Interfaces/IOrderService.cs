@@ -9,5 +9,6 @@ public interface IOrderService : IService<OrderDto, Order>
     Task<Order> GetOpenOrderAsync();
     Task CloseOrderAsync(Guid orderId);
     Task AddOrderItemAsync(Guid orderId, OrderItemDto orderItemDto);
+    IEnumerable<OrderDto> GetOrdersByStatus();
     Task<Guid> CreateOrderAsync();
 }

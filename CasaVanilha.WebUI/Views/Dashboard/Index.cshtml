@@ -1,0 +1,8 @@
+﻿@model IEnumerable<CasaVanilha.Application.DTOs.OrderItemDto>
+
+<div>
+    @foreach (var ProductOrderItem in Model) {
+        <p>@ProductOrderItem.Product.Name</p>
+        <p>@ProductOrderItem.Quantity</p>
+    }
+</div>

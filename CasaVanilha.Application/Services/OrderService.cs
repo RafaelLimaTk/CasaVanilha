@@ -64,4 +64,12 @@ public class OrderService : Service<OrderDto, Order>, IOrderService
 
         return newOrder.Id;
     }
+
+    public IEnumerable<OrderDto> GetOrdersByStatus()
+    {
+        var ordersByStatus = _orderRepository.GetOrdersByStatus().ToList();
+        var ordersByStatusDto = _mapper.Map<IEnumerable<OrderDto>>(ordersByStatus);
+
+        return ordersByStatusDto;
+    }
 }

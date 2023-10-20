@@ -51,4 +51,10 @@ public class OrderRepository : Repository<Order>, IOrderRepository
     {
         _context.Entry(order).State = EntityState.Modified;
     }
+
+    public IEnumerable<Order> GetOrdersByStatus()
+    {
+        return Entities
+            .Where(o => o.Status == "Fechada").ToList();
+    }
 }
