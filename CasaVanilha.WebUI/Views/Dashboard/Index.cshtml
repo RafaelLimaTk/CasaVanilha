@@ -1,5 +1,10 @@
 ﻿@model IEnumerable<CasaVanilha.Application.DTOs.OrderItemDto>
 
+<div class="d-flex align-items-center justify-content-between p-3 bg-primary rounded-3">
+    <h5 class="text-white m-0">Total vendido</h5>
+    <p class="text-white fs-5 m-0">R$1000</p>
+</div>
+
 <div>
     @foreach (var ProductOrderItem in Model) {
         <p>@ProductOrderItem.Product.Name</p>
