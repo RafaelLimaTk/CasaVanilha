@@ -57,4 +57,12 @@ public class OrderRepository : Repository<Order>, IOrderRepository
         return Entities
             .Where(o => o.Status == "Fechada").ToList();
     }
+
+    public IEnumerable<Order> GetAllOrdersWithOrderItems()
+    {
+        return Entities
+            .Include (o => o.OrderItems)
+            .ThenInclude(oi => oi.Product)
+            .ToList();
+    }
 }

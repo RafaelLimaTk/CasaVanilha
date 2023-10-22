@@ -10,5 +10,6 @@ public interface IOrderRepository : IRepository<Order>
     Task AddOrderItemAsync(Guid orderId, OrderItem orderItem);
     Task<Order> GetOrderWithItemsByIdAsync(Guid orderId);
     IEnumerable<Order> GetOrdersByStatus();
+    IEnumerable<Order> GetAllOrdersWithOrderItems();
     IUnitOfWork UnitOfWork { get; }
 }

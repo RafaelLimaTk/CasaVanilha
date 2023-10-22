@@ -23,9 +23,12 @@ namespace CasaVanilha.WebUI.Controllers
             _orderItemService = orderItemService;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index(int currentPage = 1, int pageSize = 5)
         {
-            return View();
+            var orderDto = _orderService.GetAllOrdersWithItems(currentPage, pageSize);
+            ViewBag.CurrentPage = currentPage;
+
+            return View(orderDto);
         }
 
         [HttpGet]
@@ -110,15 +113,37 @@ namespace CasaVanilha.WebUI.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (!HttpContext.Request.Cookies.ContainsKey("OrderId"))
+            var orderIdResult = TryGetOrderIdFromRequest(removeOrderItemDto);
+
+            if (!orderIdResult.Success)
             {
-                return BadRequest("OrderId não encontrado.");
+                return BadRequest(orderIdResult.ErrorMessage);
             }
-            var orderId = Guid.Parse(HttpContext.Request.Cookies["OrderId"]);
 
-            await _orderItemService.DeleteProductFromOrder(orderId, removeOrderItemDto.ProductId);
+            try
+            {
+                await _orderItemService.DeleteProductFromOrder(orderIdResult.OrderId, removeOrderItemDto.ProductId);
+                return CreatedAtAction(nameof(GetOpenOrder), orderIdResult.OrderId);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocorreu um erro ao remover o item do pedido.");
+            }
+        }
 
-            return CreatedAtAction(nameof(GetOpenOrder), orderId);
+        private (bool Success, Guid OrderId, string ErrorMessage) TryGetOrderIdFromRequest(RemoveOrderItemViewModel removeOrderItemDto)
+        {
+            if (removeOrderItemDto.OrderId.HasValue)
+            {
+                return (true, removeOrderItemDto.OrderId.Value, null);
+            }
+
+            if (HttpContext.Request.Cookies.ContainsKey("OrderId"))
+            {
+                return (true, Guid.Parse(HttpContext.Request.Cookies["OrderId"]), null);
+            }
+
+            return (false, Guid.Empty, "OrderId não encontrado.");
         }
 
         [HttpPost]

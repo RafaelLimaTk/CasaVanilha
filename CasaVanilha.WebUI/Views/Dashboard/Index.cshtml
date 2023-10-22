@@ -52,14 +52,10 @@
 
 @section Scripts{
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const disabledLinks = document.querySelectorAll('.pagination-button.disabled');
-            disabledLinks.forEach(function (link) {
-                link.addEventListener('click', function (e) {
-                    e.preventDefault();
-                });
+        $(document).ready(function () {
+            $('.pagination-button.disabled').on('click', function (e) {
+                e.preventDefault();
             });
         });
-
     </script>
 }
