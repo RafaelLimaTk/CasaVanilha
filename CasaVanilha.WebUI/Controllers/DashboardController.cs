@@ -12,11 +12,14 @@ namespace CasaVanilha.WebUI.Controllers
         {
             _orderService = orderService;
             _orderItemService = orderItemService;
-        }
+        }   
 
-        public IActionResult Index()
+        public IActionResult Index(int currentPage = 1, int pageSize = 10)
         {
-            var orderItemDtos = _orderItemService.GetClosedOrderByProdcut();
+            var orderItemDtos = _orderItemService.GetClosedOrderByProdcut(currentPage, pageSize);
+            var totalSalesValue = _orderItemService.GetTotalSalesValue();
+            ViewBag.TotalSalesValue = totalSalesValue;
+            ViewBag.CurrentPage = currentPage;
 
             return View(orderItemDtos);
         }

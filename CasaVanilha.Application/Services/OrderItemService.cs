@@ -83,4 +83,23 @@ public class OrderItemService : Service<OrderItemDto, OrderItem>, IOrderItemServ
 
         return groupedOrderItemDtos;
     }
+
+    public IEnumerable<OrderItemDto> GetClosedOrderByProdcut(int currentPage, int pageSize)
+    {
+        var groupedOrderItemDtos = GetClosedOrderByProdcut();
+        return groupedOrderItemDtos.Skip((currentPage - 1) * pageSize).Take(pageSize);
+    }
+
+    public decimal GetTotalSalesValue()
+    {
+        var orderItemDtos = GetClosedOrderByProdcut();
+        decimal totalSalesValue = 0;
+
+        foreach (var order in orderItemDtos)
+        {
+            totalSalesValue += order.Quantity * order.Product.UnitPrice;
+        }
+
+        return totalSalesValue;
+    }
 }

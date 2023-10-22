@@ -23,6 +23,11 @@ namespace CasaVanilha.WebUI.Controllers
             _orderItemService = orderItemService;
         }
 
+        public async Task<IActionResult> Index()
+        {
+            return View();
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetOrder(Guid orderId)
         {
