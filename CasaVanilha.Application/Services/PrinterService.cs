@@ -1,10 +1,8 @@
 ﻿using CasaVanilha.Application.Interfaces;
 using CasaVanilha.Domain.Entities;
-using System.Drawing.Printing;
-using System.IO.Ports;
-using System.Text;
 using System.Drawing;
 using System.Drawing.Printing;
+using System.Text;
 
 namespace CasaVanilha.Application.Services;
 
@@ -46,7 +44,7 @@ public class PrinterService : IPrinterService
 
         sb.AppendLine("               Casa Vanillah            ");
         sb.AppendLine("-----------------");
-        
+
         sb.AppendLine("-----------------");
         sb.AppendLine("QTD     Descrição                             Valor");
 
