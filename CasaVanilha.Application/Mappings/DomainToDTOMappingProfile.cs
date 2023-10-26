@@ -8,7 +8,9 @@ public class DomainToDTOMappingProfile : Profile
 {
     public DomainToDTOMappingProfile()
     {
-        CreateMap<Product, ProductDto>().ReverseMap();
+        CreateMap<Product, ProductDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(x => x.Id == Guid.Empty ? Guid.NewGuid() : x.Id))
+            .ReverseMap();
 
         CreateMap<OrderItem, OrderItemDto>()
             .ForMember(dst => dst.Product, opt => opt.MapFrom(src => src.Product))
