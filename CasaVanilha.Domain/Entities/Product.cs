@@ -53,7 +53,7 @@ public class Product : EntityBase
 
     private void SetDescription(string description)
     {
-        _description = description ?? throw new ArgumentNullException(nameof(description));
+        _description = description;
     }
 
     private void SetUnitPrice(decimal unitPrice)

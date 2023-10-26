@@ -57,6 +57,46 @@
 
 <div class="row mt-4">
     <div class="col-6">
+        <form>
+            <div class="input-group flex-nowrap">
+                <input type="text" name="searchTerm" class="form-control" placeholder="Pesquise o produto aqui" aria-label="Produto" aria-describedby="addon-wrapping">
+            </div>
+
+            <div class="shadow rounded-3 p-3 mt-3">
+                <div class="d-flex justify-content-between align-items-center pe-1 ps-1 border-bottom">
+                    <div class="item-container text-start ms-1">
+                        <span class="item-container-span fw-semibold">Nome</span>
+                    </div>
+                    <div class="item-container">
+                        <span class="item-container-span fw-semibold">Quantidade</span>
+                    </div>
+                    <div class="item-container text-end">
+                        <span class="item-container-span fw-semibold">Preço</span>
+                    </div>
+                </div>
+                <div id="productList" style="height: 600px;">
+                    @foreach (var Product in Model.PagedProductDto)
+                    {
+                        <div class="d-flex justify-content-between align-items-center pe-1 ps-1 pb-1 mb-2 mt-1 border-bottom clickable-product" data-id="@Product.Id">
+                            <div class="item-container text-start ms-1">
+                                <span>@Product.Name</span>
+                            </div>
+                            <div class="item-container">
+                                <span class="badge rounded-pill bg-primary">@Product.StockQuantity</span>
+                            </div>
+                            <div class="item-container text-end">
+                                <span>@string.Format("{0:C}", @Product.UnitPrice)</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="text-center">
+                    <vc:paged-list-pager paged-list="@Model" link-string="(x => Url.Action(" Index", new { page=x }))" />
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-6">
         <div class="d-flex flex-column justify-content-between shadow rounded-3 p-3 h-100">
             <div>
                 <h4 class="fs-4 mb-3">Resumo por pedido</h4>
@@ -88,47 +128,6 @@
             </div>
         </div>
     </div>
-    <div class="col-6">
-        <form>
-            <div class="input-group flex-nowrap">
-                <input type="text" name="searchTerm" class="form-control" placeholder="Pesquise o produto aqui" aria-label="Produto" aria-describedby="addon-wrapping">
-            </div>
-
-            <div class="shadow rounded-3 p-3 mt-3">
-                <div class="d-flex justify-content-between align-items-center pe-1 ps-1 border-bottom">
-                    <div class="item-container text-start ms-1">
-                        <span class="item-container-span fw-semibold">Nome</span>
-                    </div>
-                    <div class="item-container">
-                        <span class="item-container-span fw-semibold">Quantidade</span>
-                    </div>
-                    <div class="item-container text-end">
-                        <span class="item-container-span fw-semibold">Preço</span>
-                    </div>
-                </div>
-                <div id="productList" style="height: 600px;">
-                    @foreach (var Product in Model.PagedProductDto)
-                    {
-                        <div class="d-flex justify-content-between align-items-center pe-1 ps-1 pb-1 mb-2 mt-1 border-bottom">
-                            <input class="form-check-input m-0" type="checkbox" value="@Product.Id" id="flexCheckDefault" onclick="toggleOrderItem(this)">
-                            <div class="item-container text-start ms-1">
-                                <span>@Product.Name</span>
-                            </div>
-                            <div class="item-container">
-                                <span class="badge rounded-pill bg-primary">@Product.StockQuantity</span>
-                            </div>
-                            <div class="item-container text-end">
-                                <span>@string.Format("{0:C}", @Product.UnitPrice)</span>
-                            </div>
-                        </div>
-                    }
-                </div>
-                <div class="text-center">
-                    <vc:paged-list-pager paged-list="@Model" link-string="(x => Url.Action(" Index", new { page=x }))" />
-                </div>
-            </div>
-        </form>
-    </div>
 </div>
 
 @section Scripts {
@@ -157,8 +156,7 @@
                                     currency: 'BRL'
                                 });
 
-                                var productDiv = '<div class="d-flex justify-content-between align-items-center pe-1 ps-1 pb-1 mb-2 mt-1 border-bottom">' +
-                                    '<input class="form-check-input m-0" type="checkbox" value=" ' + product.id + ' " id="flexCheckDefault" onclick="toggleOrderItem(this)">' +
+                                var productDiv = '<div class="d-flex justify-content-between align-items-center pe-1 ps-1 pb-1 mb-2 mt-1 border-bottom clickable-product" data-id="'+product.id+'">' +
                                     '<div class="item-container text-start ms-1">' +
                                     '<span>' + product.name + '</span>' +
                                     '</div>' +
@@ -171,7 +169,6 @@
                                     '</div>';
                                 productListDiv.append(productDiv);
                             });
-
                         },
                         error: function (error) {
                             console.log(error);
@@ -179,18 +176,28 @@
                     });
                 }, 300);
             });
+
+            $('#productList').on('click', '.clickable-product', function () {
+                var productId = $(this).data('id');
+                toggleOrderItem(productId);
+            });
         });
 
-        function toggleOrderItem(checkbox) {
-            var productId = checkbox.value.trim();
-            var isChecked = checkbox.checked;
-            var quantity = 1;
+        var addedProductIds = [];
+
+        function toggleOrderItem(productId) {
+            var isAdded = addedProductIds.includes(productId);
+
             var currentOrderId = $('#currentOrderId').val();
 
-            if (isChecked) {
-                createNewOrder(currentOrderId, productId, quantity);
-            } else {
+            if (isAdded) {
+                addedProductIds = addedProductIds.filter(id => id !== productId);
+
                 removeOrderItem(currentOrderId, productId);
+            } else {
+                addedProductIds.push(productId);
+
+                createNewOrder(currentOrderId, productId, 1);
             }
         }
 

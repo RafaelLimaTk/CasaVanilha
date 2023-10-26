@@ -1,0 +1,140 @@
+﻿@model IEnumerable<CasaVanilha.Application.DTOs.OrderDto>
+
+@{
+    ViewData["Title"] = "Ordem";
+}
+
+<style>
+    .circle-completed-order {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        background-color: #54ca92;
+    }
+
+    .circle-incomplete-order {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        background-color: #EB4335;
+    }
+
+    .details-dropdown {
+        display: none;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    i.bi-chevron-down {
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .rotate-icon {
+        transform: rotate(180deg);
+    }
+</style>
+
+@{
+    var isPreviousDisabled = ViewBag.CurrentPage == 1;
+    var isNextDisabled = ViewBag.CurrentPage == ViewBag.TotalPages;
+    var previousPageLink = Url.Action("Index", new { currentPage = ViewBag.CurrentPage - 1, pageSize = 5 });
+    var nextPageLink = Url.Action("Index", new { currentPage = ViewBag.CurrentPage + 1, pageSize = 5 });
+}
+
+@foreach (var orderDto in Model)
+{
+    string idAsString = orderDto.Id.ToString();
+    string displayId = idAsString.Length > 6 ? idAsString.Substring(0, 6) : idAsString;
+
+    System.Globalization.CultureInfo culture = new System.Globalization.CultureInfo("pt-BR");
+    string formattedDate = orderDto.OrderDateTime.ToString("dd MMM", culture).ToLower();
+
+    bool hasOrderItems = orderDto.OrderItems != null && orderDto.OrderItems.Count > 0;
+
+    <div class="d-flex align-items-center justify-content-between shadow rounded-2 p-3 mb-3">
+        <div class="d-flex align-items-center justify-content-center">
+            <div class="me-2 p-3 rounded-circle fs-5 @(hasOrderItems ? "circle-completed-order" : "circle-incomplete-order")">
+                <i class="bi @(hasOrderItems ? "bi-check-lg" : "bi-x-lg") text-white me-0 p-0"></i>
+            </div>
+            <div>
+                <h5 class="fw-bold mb-1">Ordem #@displayId.ToUpper()</h5>
+                <p class="text-black-50 m-0">@((hasOrderItems) ? "Foi fechada com sucesso" : "Não foi fechada com sucesso")</p>
+                <div class="d-flex align-items-center" data-id="@displayId" style="cursor: pointer;">
+                    <p class="me-1 m-0">Veja detalhes</p>
+                    <i class="bi bi-chevron-down text-black-50" style="font-size: 13px;"></i>
+                </div>
+            </div>
+        </div>
+        <div>
+            <p class="m-0 text-black-50 text-end mb-1">@formattedDate</p>
+            <h6><span class="badge bg-primary fs-6">R$@orderDto.TotalPrice</span></h6>
+        </div>
+    </div>
+    <div class="details-dropdown" data-id="@displayId">
+        @foreach (var item in orderDto.OrderItems)
+        {
+            <div class="d-flex align-items-center justify-content-between">
+                <p class="mb-2 mt-2">@item.Product.Name • Quantidade: @item.Quantity • Preço: R$@(item.Product.UnitPrice * item.Quantity)</p>
+                <a class="btn btn-sm btn-outline-danger fp-remove" data-product-id="@item.Product.Id" data-order-id="@orderDto.Id"><i class="bi bi-trash"></i></a>
+            </div>
+        }
+    </div>
+}
+
+<div>
+    <a href="@previousPageLink" class="pagination-button @(isPreviousDisabled ? "disabled" : "") btn btn-outline-primary">Anterior</a>
+    <a href="@nextPageLink" class="pagination-button @(isNextDisabled ? "disabled" : "") btn btn-outline-primary">Próximo</a>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('.pagination-button.disabled').on('click', function (e) {
+                e.preventDefault();
+            });
+        });
+
+        $(document).ready(function () {
+            $(".d-flex.align-items-center").on('click', function () {
+                var id = $(this).data('id');
+
+                var dropdown = $('.details-dropdown[data-id="' + id + '"]');
+
+                var icon = $(this).find('i.bi-chevron-down');
+
+                icon.toggleClass('rotate-icon');
+                dropdown.slideToggle('fast');
+            });
+        });
+
+        $(document).ready(function () {
+            $(".fp-remove").on('click', function (e) {
+                e.preventDefault();
+
+                var productId = $(this).data('product-id');
+                var orderId = $(this).data('order-id');
+
+                $.ajax({
+                    url: '/Order/RemoveOrderItem',
+                    type: 'POST',
+                    data: JSON.stringify({ ProductId: productId, OrderId: orderId }),
+                    contentType: 'application/json',
+                    success: function (response) {
+                        location.reload();
+                    },
+                    error: function (error) {
+                        alert(error.responseText);
+                    }
+                });
+            });
+        });
+
+    </script>
+}

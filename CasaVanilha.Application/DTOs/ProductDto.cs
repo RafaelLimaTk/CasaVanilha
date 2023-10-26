@@ -8,9 +8,8 @@ public class ProductDto
 
     [Required(ErrorMessage = "O nome do produto é obrigatório.")]
     [StringLength(120, ErrorMessage = "O nome do produto não pode exceder 120 caracteres.")]
-    public string? Name { get; set; }
+    public string Name { get; set; }
 
-    [StringLength(500, ErrorMessage = "A descrição do produto não pode exceder 500 caracteres.")]
     public string? Description { get; set; }
 
     [Required(ErrorMessage = "O preço unitário é obrigatório.")]

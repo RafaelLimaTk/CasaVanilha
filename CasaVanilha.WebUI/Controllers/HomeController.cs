@@ -37,6 +37,16 @@ namespace CasaVanilha.WebUI.Controllers
                 HttpContext.Response.Cookies.Delete("OrderId");
             }
 
+            var newOrder = await _orderService.GetOpenOrderAsync();
+            if (newOrder != null)
+            {
+                var isOrderEmpty = _orderItemService.GetProductsByOrderId(newOrder.Id);
+                if (!isOrderEmpty.Any())
+                {
+                    await _orderService.DeleteAsync(newOrder.Id);
+                }
+            }
+
             orderIdValue = await _orderService.CreateOrderAsync();
             HttpContext.Response.Cookies.Append("OrderId", orderIdValue.ToString());
 

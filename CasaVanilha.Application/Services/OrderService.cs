@@ -5,6 +5,7 @@ using CasaVanilha.Application.Interfaces;
 using CasaVanilha.Application.Services.Base;
 using CasaVanilha.Domain.Entities;
 using CasaVanilha.Domain.Interfaces;
+using System.Drawing.Printing;
 
 namespace CasaVanilha.Application.Services;
 
@@ -63,5 +64,28 @@ public class OrderService : Service<OrderDto, Order>, IOrderService
         await _orderRepository.CreateAsync(newOrder);
 
         return newOrder.Id;
+    }
+
+    public IEnumerable<OrderDto> GetOrdersByStatus()
+    {
+        var ordersByStatus = _orderRepository.GetOrdersByStatus().ToList();
+        var ordersByStatusDto = _mapper.Map<IEnumerable<OrderDto>>(ordersByStatus);
+
+        return ordersByStatusDto;
+    }
+
+    public IEnumerable<OrderDto> GetAllOrdersWithItems()
+    {
+        var orders = _orderRepository.GetAllOrdersWithOrderItems().ToList();
+
+        var orderDtos = _mapper.Map<IEnumerable<OrderDto>>(orders);
+        return orderDtos;
+    }
+
+    public IEnumerable<OrderDto> GetAllOrdersWithItems(int currentPage, int pageSize)
+    {
+        var groupedOrderDto = GetAllOrdersWithItems();
+
+        return groupedOrderDto.Skip((currentPage - 1) * pageSize).Take(pageSize);
     }
 }

@@ -1,0 +1,91 @@
+﻿@model CasaVanilha.WebUI.ViewModels.ProductEditViewModel
+
+@{
+    ViewBag.title = Model.Product.Id == Guid.Empty ? "Adicionar Produto" : "Editar Produto";
+    var modalId = "modal_" + Guid.NewGuid();
+}
+
+<div class="modal fade" id="@modalId" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addProductModalLabel">@ViewBag.title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <form id="ProductForm">
+                    @Html.HiddenFor(a => a.Product.Id)
+                    <div class="mb-3">
+                        <span style="color:red">*</span>
+                        <label for="productName" class="form-label">Nome</label>
+                        <input type="text" class="form-control" id="productName" name="Product.Name" autofocus value="@Model.Product.Name">
+                        <span asp-validation-for="Product.Name" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="productDescription" class="form-label">Descrição</label>
+                        <input type="text" class="form-control" id="productDescription" name="Product.Local" value="@Model.Product.Description">
+                        <span asp-validation-for="Product.Description" class="text-danger"></span>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <span style="color:red">*</span>
+                            <label for="productUnitPrice" class="form-label">Preço</label>
+                            <input type="text" class="form-control" id="productUnitPrice" name="Product.UnitPrice" value="@(Model.Product.UnitPrice == 0 ? "" : Model.Product.UnitPrice)">
+                        </div>
+                        <div class="col-6 mb-3">
+                            <span style="color:red">*</span>
+                            <label for="productStockQuantity" class="form-label">Estoque</label>
+                            <input type="text" class="form-control" name="Product.StockQuantity" value="@(Model.Product.StockQuantity == 0 ? 1000 : Model.Product.StockQuantity)">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                @if (Model.Product.Id != Guid.Empty)
+                {
+                    <button type="button" class="btn btn-danger fp-del" value="@Model.Product.Id">Deletar Produto</button>
+                }
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary fp-save">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $("#@modalId").modal('show');
+
+        $(document).ready(function () {
+            $(".fp-save").click(function () {
+                let formData = $("#ProductForm").serialize();
+                let url = $("#@modalId").data("url");
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        $("#@modalId").modal('hide');
+                    }
+                });
+            });
+        });
+
+        $(document).ready(function () {
+            $("#@modalId").on('hidden hidden.bs.modal', function () {
+                $("#@modalId").remove();
+            });
+        });
+
+        $(document).ready(function () {
+            $("#productUnitPrice").on("input", function () {
+                var value = $(this).val();
+
+                value = value.replace(/[^0-9]/g, "");
+
+                var displayValue = (parseInt(value) / 100).toFixed(2).replace(".", ",");
+
+                $(this).val(displayValue);
+            });
+        });
+    </script>
+
+</div>

@@ -1,0 +1,61 @@
+﻿@model IEnumerable<CasaVanilha.Application.DTOs.OrderItemDto>
+
+@{
+    var isPreviousDisabled = ViewBag.CurrentPage == 1;
+    var isNextDisabled = ViewBag.CurrentPage == ViewBag.TotalPages;
+    var previousPageLink = Url.Action("Index", new { currentPage = ViewBag.CurrentPage - 1, pageSize = 10 });
+    var nextPageLink = Url.Action("Index", new { currentPage = ViewBag.CurrentPage + 1, pageSize = 10 });
+}
+
+<style>
+    .card-totals-sold {
+        background-color: #007BF8;
+    }
+
+        .pagination-button.disabled {
+            color: #ccc;
+            border-color: #ccc;
+            cursor: not-allowed;
+        }
+
+</style>
+
+<div class="d-flex align-items-center justify-content-between p-3 card-totals-sold rounded-3 mb-3">
+    <h5 class="text-white m-0">Total vendido</h5>
+    <p class="text-white fs-5 m-0">R$@ViewBag.totalSalesValue</p>
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Nome do Produto</th>
+            <th>Quantidade Vendida</th>
+            <th>Valor</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Product.Name</td>
+                <td>@item.Quantity</td>
+                <td>R$@(item.Product.UnitPrice * item.Quantity)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <a href="@previousPageLink" class="pagination-button @(isPreviousDisabled ? "disabled" : "") btn btn-outline-primary">Anterior</a>
+    <a href="@nextPageLink" class="pagination-button @(isNextDisabled ? "disabled" : "") btn btn-outline-primary">Próximo</a>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('.pagination-button.disabled').on('click', function (e) {
+                e.preventDefault();
+            });
+        });
+    </script>
+}
