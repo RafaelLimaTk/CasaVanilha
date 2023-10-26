@@ -1,7 +1,10 @@
 ﻿using CasaVanilha.Application.Interfaces;
 using CasaVanilha.Domain.Entities;
+using System.Drawing.Printing;
 using System.IO.Ports;
 using System.Text;
+using System.Drawing;
+using System.Drawing.Printing;
 
 namespace CasaVanilha.Application.Services;
 
@@ -16,22 +19,38 @@ public class PrinterService : IPrinterService
 
     public void PrintOrderItems(List<OrderItem> orderItems)
     {
-        SerialPort sp = new SerialPort("COM3", 9600, Parity.None, 8, StopBits.One);
-        sp.Open();
+        PrintDocument printDoc = new PrintDocument();
+        printDoc.PrinterSettings.PrinterName = "POS58";
 
-        string formattedOrderItems = FormatOrderItems(orderItems);
+        printDoc.PrintPage += (sender, e) =>
+        {
+            string formattedOrderItems = FormatOrderItems(orderItems);
+            Font printFont = new Font("Arial", 6);
+            e.Graphics.DrawString(formattedOrderItems, printFont, Brushes.Black, 10, 10);
+        };
 
-        sp.Write(formattedOrderItems);
-        sp.Close();
+        try
+        {
+            printDoc.Print();
+            Console.WriteLine("Sucesso ao imprimir.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao tentar imprimir: {ex.Message}");
+        }
     }
 
     private string FormatOrderItems(List<OrderItem> orderItems)
     {
         StringBuilder sb = new StringBuilder();
 
-        sb.AppendLine("Obrigado por comprar na Casa Vanilha!");
-        sb.AppendLine("Nome                       Quantidade                    Valor");
+        sb.AppendLine("               Casa Vanillah            ");
+        sb.AppendLine("-----------------");
+        
+        sb.AppendLine("-----------------");
+        sb.AppendLine("QTD     Descrição                             Valor");
 
+        decimal totalValueProduct = 0m;
         foreach (var item in orderItems)
         {
             var product = _productService.GetByIdAsync(item.ProductId);
@@ -39,10 +58,13 @@ public class PrinterService : IPrinterService
             if (product != null)
             {
                 decimal totalValue = product.Result.UnitPrice * item.Quantity;
+                totalValueProduct += totalValue;
 
-                sb.AppendLine($"{product.Result.Name.PadRight(30)} {item.Quantity.ToString().PadRight(30)} {totalValue.ToString("F2").PadLeft(5)}");
+                sb.AppendLine($"{item.Quantity.ToString().PadRight(6)} {product.Result.Name.PadRight(35)} {totalValue.ToString("F2").PadLeft(5)}");
             }
         }
+        sb.AppendLine("------------------------------------------");
+        sb.AppendLine($"Total {totalValueProduct.ToString("F2")}");
 
         return sb.ToString();
     }

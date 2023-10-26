@@ -41,7 +41,7 @@ public class OrderService : Service<OrderDto, Order>, IOrderService
 
         await _productService.UpdateStockAsync(orderItems.ToList());
 
-        //_printerService.PrintOrderItems(orderItems.ToList());
+        _printerService.PrintOrderItems(orderItems.ToList());
     }
 
     public async Task AddOrderItemAsync(Guid orderId, OrderItemDto orderItemDto)
