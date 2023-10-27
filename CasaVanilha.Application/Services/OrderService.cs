@@ -33,15 +33,22 @@ public class OrderService : Service<OrderDto, Order>, IOrderService
         return await _orderRepository.GetOpenOrderAsync();
     }
 
-    public async Task CloseOrderAsync(Guid orderId)
+    public async Task CloseOrderAsync(Guid orderId, string observation)
     {
-        await _orderRepository.CloseOrderAsync(orderId);
+        await _orderRepository.CloseOrderAsync(orderId, observation);
 
         var orderItems = _orderItemService.GetProductsByOrderId(orderId);
 
         await _productService.UpdateStockAsync(orderItems.ToList());
 
-        _printerService.PrintOrderItems(orderItems.ToList());
+        //_printerService.PrintOrderItems(orderItems.ToList(), observation);
+    }
+
+    public void PrintOrderItems(Guid orderId, string observation)
+    {
+        var orderItems = _orderItemService.GetProductsByOrderId(orderId);
+
+        //_printerService.PrintOrderItems(orderItems.ToList(), observation);
     }
 
     public async Task AddOrderItemAsync(Guid orderId, OrderItemDto orderItemDto)

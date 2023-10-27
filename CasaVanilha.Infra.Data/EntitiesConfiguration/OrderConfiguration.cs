@@ -17,6 +17,10 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
             .IsRequired()
             .HasMaxLength(50);
 
+        builder.Property(o => o.Observation)
+            .IsRequired(false)
+            .HasMaxLength(250);
+
         builder.HasMany(o => o.OrderItems)
             .WithOne(oi => oi.Order)
             .HasForeignKey(oi => oi.OrderId)

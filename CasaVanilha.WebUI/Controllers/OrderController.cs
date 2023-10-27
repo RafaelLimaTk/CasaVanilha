@@ -54,7 +54,7 @@ namespace CasaVanilha.WebUI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CloseOrder()
+        public async Task<IActionResult> CloseOrder([FromBody] OrderPrinterViewModel orderPrinterViewModel)
         {
             if (!HttpContext.Request.Cookies.ContainsKey("OrderId"))
             {
@@ -62,7 +62,7 @@ namespace CasaVanilha.WebUI.Controllers
             }
             var OrderId = Guid.Parse(HttpContext.Request.Cookies["OrderId"]);
 
-            await _orderService.CloseOrderAsync(OrderId);
+            await _orderService.CloseOrderAsync(OrderId, orderPrinterViewModel.Observation);
 
             return CreatedAtAction(nameof(GetOpenOrder), OrderId);
         }
@@ -167,6 +167,14 @@ namespace CasaVanilha.WebUI.Controllers
             }
 
             return CreatedAtAction(nameof(GetOpenOrder), orderId);
+        }
+
+        [HttpPost]
+        public IActionResult PrinterOrderItems([FromBody] OrderPrinterViewModel orderPrinterViewModel)
+        {
+            _orderService.PrintOrderItems(orderPrinterViewModel.OrderId, orderPrinterViewModel.Observation);
+
+            return CreatedAtAction(nameof(GetOpenOrder), orderPrinterViewModel.OrderId);
         }
     }
 }

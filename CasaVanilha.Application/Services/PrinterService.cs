@@ -15,14 +15,14 @@ public class PrinterService : IPrinterService
         _productService = productService;
     }
 
-    public void PrintOrderItems(List<OrderItem> orderItems)
+    public void PrintOrderItems(List<OrderItem> orderItems, string observation)
     {
         PrintDocument printDoc = new PrintDocument();
         printDoc.PrinterSettings.PrinterName = "POS58";
 
         printDoc.PrintPage += (sender, e) =>
         {
-            string formattedOrderItems = FormatOrderItems(orderItems);
+            string formattedOrderItems = FormatOrderItems(orderItems, observation);
             Font printFont = new Font("Arial", 6);
             e.Graphics.DrawString(formattedOrderItems, printFont, Brushes.Black, 10, 10);
         };
@@ -38,13 +38,13 @@ public class PrinterService : IPrinterService
         }
     }
 
-    private string FormatOrderItems(List<OrderItem> orderItems)
+    private string FormatOrderItems(List<OrderItem> orderItems, string observation)
     {
         StringBuilder sb = new StringBuilder();
 
         sb.AppendLine("               Casa Vanillah            ");
         sb.AppendLine("-----------------");
-
+        sb.AppendLine($"Obs: {observation}");
         sb.AppendLine("-----------------");
         sb.AppendLine("QTD     Descrição                             Valor");
 

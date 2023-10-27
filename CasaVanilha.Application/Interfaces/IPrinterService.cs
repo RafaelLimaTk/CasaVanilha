@@ -4,5 +4,5 @@ namespace CasaVanilha.Application.Interfaces;
 
 public interface IPrinterService
 {
-    void PrintOrderItems(List<OrderItem> orderItems);
+    void PrintOrderItems(List<OrderItem> orderItems, string observation);
 }

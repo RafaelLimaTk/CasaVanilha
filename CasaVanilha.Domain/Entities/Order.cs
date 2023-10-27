@@ -6,6 +6,7 @@ public class Order : EntityBase
 {
     private DateTime _orderDateTime;
     private string _status;
+    private string _observation;
     private List<OrderItem> _orderItems = new List<OrderItem>();
 
     public Order() { }
@@ -26,6 +27,12 @@ public class Order : EntityBase
     {
         get => _status;
         private set => SetStatus(value);
+    }
+
+    public string Observation
+    {
+        get => _observation;
+        private set => SetObservation(value);
     }
 
     public void Close()
@@ -56,6 +63,11 @@ public class Order : EntityBase
         if (string.IsNullOrWhiteSpace(status))
             throw new ArgumentException("Status cannot be empty or null", nameof(status));
         _status = status;
+    }
+
+    public void SetObservation(string observation)
+    {
+        _observation = observation;
     }
 
     public void AddProduct(Product product, int quantity)
