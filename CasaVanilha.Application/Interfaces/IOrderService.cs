@@ -1,7 +1,6 @@
 ﻿using CasaVanilha.Application.DTOs;
 using CasaVanilha.Application.Interfaces.Base;
 using CasaVanilha.Domain.Entities;
-using System.Drawing.Printing;
 
 namespace CasaVanilha.Application.Interfaces;
 
@@ -14,5 +13,5 @@ public interface IOrderService : IService<OrderDto, Order>
     Task<Guid> CreateOrderAsync();
     IEnumerable<OrderDto> GetAllOrdersWithItems();
     IEnumerable<OrderDto> GetAllOrdersWithItems(int currentPage, int pageSize);
-    void PrintOrderItems(Guid orderId);
+    void PrintOrderItems(Guid orderId, string observation);
 }

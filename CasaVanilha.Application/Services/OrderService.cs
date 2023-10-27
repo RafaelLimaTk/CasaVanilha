@@ -41,14 +41,14 @@ public class OrderService : Service<OrderDto, Order>, IOrderService
 
         await _productService.UpdateStockAsync(orderItems.ToList());
 
-        //_printerService.PrintOrderItems(orderItems.ToList());
+        //_printerService.PrintOrderItems(orderItems.ToList(), observation);
     }
 
-    public void PrintOrderItems(Guid orderId)
+    public void PrintOrderItems(Guid orderId, string observation)
     {
         var orderItems = _orderItemService.GetProductsByOrderId(orderId);
 
-        //_printerService.PrintOrderItems(orderItems.ToList());
+        //_printerService.PrintOrderItems(orderItems.ToList(), observation);
     }
 
     public async Task AddOrderItemAsync(Guid orderId, OrderItemDto orderItemDto)
