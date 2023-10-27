@@ -273,8 +273,8 @@
             var itemTotalPrice = order.product.unitPrice * order.quantity;
             totalPriceItems += itemTotalPrice;
             return `
-                <div class="d-flex justify-content-between align-items-center pe-1 ps-1 pb-1 mb-2 mt-1 border-bottom clickable-product-order" data-id="${order.product.id}">
-                    <div class="item-container text-start ms-1">
+                <div class="d-flex justify-content-between align-items-center pe-1 ps-1 pb-1 mb-2 mt-1 border-bottom">
+                    <div class="item-container text-start ms-1 clickable-product-order" data-id="${order.product.id}">
                         <span>${order.product.name}</span>
                     </div>
                     <div class="item-container">
@@ -285,7 +285,7 @@
                             <button onclick="increaseQuantity('${order.product.id}')" class="btn">+</button>
                         </div>
                     </div>
-                    <div class="item-container text-end">
+                    <div class="item-container text-end clickable-product-order" data-id="${order.product.id}">
                         <span>${itemTotalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                     </div>
                 </div>
