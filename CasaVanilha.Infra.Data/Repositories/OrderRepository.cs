@@ -31,12 +31,13 @@ public class OrderRepository : Repository<Order>, IOrderRepository
         await _orderItemRepository.CreateAsync(orderItemSave);
     }
 
-    public async Task CloseOrderAsync(Guid orderId)
+    public async Task CloseOrderAsync(Guid orderId, string observation)
     {
         var order = await Entities.FindAsync(orderId);
         if (order != null)
         {
             order.Close();
+            order.SetObservation(observation);
             await _context.SaveChangesAsync();
         }
     }

@@ -33,9 +33,9 @@ public class OrderService : Service<OrderDto, Order>, IOrderService
         return await _orderRepository.GetOpenOrderAsync();
     }
 
-    public async Task CloseOrderAsync(Guid orderId)
+    public async Task CloseOrderAsync(Guid orderId, string observation)
     {
-        await _orderRepository.CloseOrderAsync(orderId);
+        await _orderRepository.CloseOrderAsync(orderId, observation);
 
         var orderItems = _orderItemService.GetProductsByOrderId(orderId);
 
