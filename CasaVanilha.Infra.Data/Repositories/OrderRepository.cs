@@ -63,6 +63,7 @@ public class OrderRepository : Repository<Order>, IOrderRepository
         return Entities
             .Include (o => o.OrderItems)
             .ThenInclude(oi => oi.Product)
+            .OrderByDescending(o => o.OrderDateTime)
             .ToList();
     }
 }

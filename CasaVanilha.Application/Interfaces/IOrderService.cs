@@ -14,4 +14,5 @@ public interface IOrderService : IService<OrderDto, Order>
     Task<Guid> CreateOrderAsync();
     IEnumerable<OrderDto> GetAllOrdersWithItems();
     IEnumerable<OrderDto> GetAllOrdersWithItems(int currentPage, int pageSize);
+    void PrintOrderItems(Guid orderId);
 }

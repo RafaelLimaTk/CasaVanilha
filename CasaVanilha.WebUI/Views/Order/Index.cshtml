@@ -74,7 +74,10 @@
         </div>
         <div>
             <p class="m-0 text-black-50 text-end mb-1">@formattedDate</p>
-            <h6><span class="badge bg-primary fs-6">R$@orderDto.TotalPrice</span></h6>
+            <div class="d-flex align-items-center">
+                <a class="btn btn-outline-primary btn-sm me-2 fp-printer" data-order-id="@orderDto.Id"><i class="bi bi-printer"></i></a>
+                <h6 class="m-0"><span class="badge bg-primary fs-6">R$@orderDto.TotalPrice.ToString("0.00")</span></h6>
+            </div>
         </div>
     </div>
     <div class="details-dropdown" data-id="@displayId">
@@ -125,6 +128,25 @@
                     url: '/Order/RemoveOrderItem',
                     type: 'POST',
                     data: JSON.stringify({ ProductId: productId, OrderId: orderId }),
+                    contentType: 'application/json',
+                    success: function (response) {
+                        location.reload();
+                    },
+                    error: function (error) {
+                        alert(error.responseText);
+                    }
+                });
+            });
+
+            $(".fp-printer").on('click', function (e) {
+                e.preventDefault();
+
+                var orderId = $(this).data('order-id');
+
+                $.ajax({
+                    url: '/Order/PrinterOrderItems',
+                    type: 'POST',
+                    data: JSON.stringify({ OrderId: orderId }),
                     contentType: 'application/json',
                     success: function (response) {
                         location.reload();

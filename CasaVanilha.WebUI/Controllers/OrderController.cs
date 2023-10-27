@@ -168,5 +168,13 @@ namespace CasaVanilha.WebUI.Controllers
 
             return CreatedAtAction(nameof(GetOpenOrder), orderId);
         }
+
+        [HttpPost]
+        public IActionResult PrinterOrderItems([FromBody] OrderPrinterViewModel orderId)
+        {
+            _orderService.PrintOrderItems(orderId.OrderId);
+
+            return CreatedAtAction(nameof(GetOpenOrder), orderId.OrderId);
+        }
     }
 }
